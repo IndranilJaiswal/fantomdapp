@@ -11,11 +11,13 @@
     "deploy": "next build && next export && npx thirdweb@latest upload out"
   },
   "dependencies": {
+    "@covalenthq/web3-components": "^0.3.6",
     "@thirdweb-dev/react": "^3",
     "@thirdweb-dev/sdk": "^3",
+    "antd": "^5.6.3",
     "ethers": "^5",
     "next": "^13",
-    "react": "^18.2",
+    "react": "^18.2.0",
     "react-dom": "^18.2"
   },
   "devDependencies": {
