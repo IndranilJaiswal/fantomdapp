@@ -51,17 +51,24 @@ export default function Home() {
     const getNFTData = ( trait, res ) => {
       const match = res.data.items.find(item => trait === item.nft_data.external_data.name)
       if (match) {
-          console.log("Phrase exists in the contract.")
+          return "Phrase exists in the contract."
       } else {
-          console.log("Phrase does not exist in the contract.")
+          return "Phrase does not exist in the contract."
       }
   }
     const main = async () => {
       const trait = uniqueWord
       const data = await getDataFromCovalentAPI()
-      getNFTData(trait, data)
+      const phrase = getNFTData(trait, data)
+      console.log(phrase)
+      show_alert(phrase)
   }
 
+  //function to alert if the phrase already exists in the contract
+
+  function show_alert(phrase){
+    alert("Hello " + phrase);
+  }
 
 const [uniqueWord, setUniqueWord] = useState(null)
 
