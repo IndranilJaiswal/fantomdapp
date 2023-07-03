@@ -91,7 +91,7 @@ const onSubmit = (values) => {
     <div className={styles.container}>
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="https://github.com/meetDeveloper/freeDictionaryAPI/tree/master/meta/wordList">PhraseMint</a>!
+          Welcome to <a href="https://github.com/IndranilJaiswal/fantomdapp">PhraseMint</a>!
 
         </h1>
         <p className={styles.description}>
