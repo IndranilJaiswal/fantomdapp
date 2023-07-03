@@ -2,13 +2,14 @@
   "name": "fantomtest",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "export": "next export",
-    "deploy": "next build && next export && npx thirdweb@latest upload out"
+    "deploy": "yarn build && npx thirdweb@latest upload build"
   },
   "dependencies": {
     "@covalenthq/web3-components": "^0.3.6",

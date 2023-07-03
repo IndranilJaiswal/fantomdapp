@@ -10,6 +10,8 @@ import { useState } from 'react';
 import styles from "../styles/Home.module.css";
 import { Input } from 'antd';
 const { Search } = Input
+
+//Form for inputting the users word
 const FormControls = ({onSubmit}) => {
     return (
         <Search placeholder='Enter Word' onSearch={onSubmit} enterButton
@@ -18,35 +20,66 @@ const FormControls = ({onSubmit}) => {
         }}/>
     )
       }
-//const contractAddressNFT = "0x9BC2Fc92EF2cE31a03De0df3375439376b391b7C"
-const contractAddressNFT = "0xDbf89Cf00dA32466a0cB095826F314Dae437Bc72"
-const contractAddressPT = "0x37E8BE627817a3A5ef82cF27f0df000F29A083B6"
-const tokenAmount = 1;
 
+//ERC1155 Contract Address for wordmint
+const contractAddress = "0xE4D38bEa73B7c763915e0b12C2d0cF8DCA4B8aa5"
+
+const apiKey = "cqt_rQdbVQjQ6R37gcwCJm9cDdgmBypW"
 
 export default function Home() {
-  const { contract } = useContract(contractAddressNFT);
-  const { contractPT } = useContract(contractAddressPT, "PT");
 
-  const { data: nfts, isLoading, error } = useNFTs(contract);
-  const { data: contractName } = useContractRead(contract, "name");
-  const { data: contractNamePT } = useContractRead(contractPT, "name");
+  //const to read contract address
 
+  const { contract } = useContract(contractAddress);
+
+  //ERC1155 Contract Address for wordmint
+
+  //const to read connected wallet address
   const address = useAddress()
-  //console.log(address);
- // console.log(contractNamePT);
 
- const [uniqueWord, setUniqueWord] = useState(null)
- const onSubmit = (values) => {
-     setUniqueWord(values)
- }
 
-  const metadata = {
-    name: uniqueWord,
-    description: "This is a cool NFT",
-    image: ("https://portal.thirdweb.com/img/thirdweb-logo-transparent-white.svg"), // This can be an image url or file
+  //function to fetch NFT contract data from Covalent API
+    const getDataFromCovalentAPI = async () => {
+      const getNFTMetadata = 'https://api.covalenthq.com/v1/fantom-mainnet/nft/0xE4D38bEa73B7c763915e0b12C2d0cF8DCA4B8aa5/metadata/?no-metadata=true&with-uncached=true&key=cqt_rQdbVQjQ6R37gcwCJm9cDdgmBypW'
+      const res = await fetch(getNFTMetadata, {method: 'GET', headers: {
+        "Authorization": `Basic ${btoa(apiKey + ':')}`
+      }})
+      return res.json()
+    }
+
+    //function to check unique word inputted by the user already exists in the NFT contract
+    const getNFTData = ( trait, res ) => {
+      const match = res.data.items.find(item => trait === item.nft_data.external_data.name)
+      if (match) {
+          console.log("Phrase exists in the contract.")
+      } else {
+          console.log("Phrase does not exist in the contract.")
+      }
+  }
+    const main = async () => {
+      const trait = uniqueWord
+      const data = await getDataFromCovalentAPI()
+      getNFTData(trait, data)
   }
 
+
+const [uniqueWord, setUniqueWord] = useState(null)
+
+//onSubmit does two things:
+//1. sets the constant unique word and 
+//2. then calls the main function to fetch data from API and check if the word already exists in the contract.
+const onSubmit = (values) => {
+    setUniqueWord(values)
+    main()
+}
+  //constant to define the parameters for the NFT
+  const metadata = {
+    name: uniqueWord,
+    description: "This is a cool word",
+    attributes: [{trait_type:"Word", value:uniqueWord}]
+  }
+
+  //constant to define the structure the NFT metadata with suplly (supply = 1) to avoid batch minting.
   const metadataWithSupply = {
     metadata,
     supply: 1, // The number of this NFT you want to mint
@@ -58,12 +91,14 @@ export default function Home() {
     <div className={styles.container}>
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="https://thirdweb.com/">WordMint</a>!
+          Welcome to <a href="https://github.com/meetDeveloper/freeDictionaryAPI/tree/master/meta/wordList">PhraseMint</a>!
 
         </h1>
-
         <p className={styles.description}>
-          Get started by creating a new word!
+          Get started by creating a new word in the search bar!
+        </p>
+        <p className={styles.description}>
+          Click on the search icon to check if your word has already been minted
         </p>
         <div>
         <div style={{width: '100%', margin: 'auto'}}></div>
@@ -71,22 +106,13 @@ export default function Home() {
         </div>
         <div className={styles.code}>
           <Web3Button
-            contractAddress={contractAddressNFT}   
+          //button to mint the new word
+            contractAddress={contractAddress}   
             action={(contract) => {
               contract.erc1155.mint(metadataWithSupply)
               }}
           >
               Mint a Word
-          </Web3Button>
-        </div>
-        <div className={styles.code}>
-          <Web3Button
-            contractAddress={contractAddressPT}
-            action={(contractPT) =>
-              contractPT.erc20.mint(tokenAmount)
-            }
-          >
-            Mint Coins
           </Web3Button>
         </div>
       </main>
